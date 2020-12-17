@@ -46,7 +46,27 @@ export class API {
     const params = new URLSearchParams();
     params.append('grant_type', 'authorization_code');
     params.append('code', code);
-    params.append('redirect_uri', 'http://localhost:8080/callback');
+    params.append('redirect_uri', process.env.REDIRECT_URI);
+    const request = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${API.token}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    });
+    if (!request.ok) {
+      throw new Error('Unable to authenticate!');
+    }
+    const json = await request.json();
+    return json as UserCredentials;
+  };
+  public static refreshUserCredentials = async (
+    refreshToken: string
+  ): Promise<UserCredentials> => {
+    const params = new URLSearchParams();
+    params.append('grant_type', 'refresh_token');
+    params.append('refresh_token', refreshToken);
     const request = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
       headers: {

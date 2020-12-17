@@ -12,20 +12,20 @@ app.use(express.static('public'));
 app.set('views', './views');
 app.set('view engine', 'ejs');
 
-app.get('/', async (req: Request, res: Response) => {
+app.get('/', async (_: Request, res: Response) => {
   res.status(200);
   res.render('index', { credentials: null });
 });
 
 app.get('/authorize', (req: Request, res: Response) => {
+  const showDialog = req.query.show_dialog === 'false' ? 'false' : 'true';
   const scopes = 'user-modify-playback-state';
-  const redirectUri = `http://localhost:${port}/callback`;
   const params = [
     `client_id=${process.env.SPOTIFY_CLIENT_ID}`,
-    `redirect_uri=${encodeURIComponent(redirectUri)}`,
+    `redirect_uri=${encodeURIComponent(process.env.REDIRECT_URI)}`,
     'response_type=code',
     `scope=${encodeURIComponent(scopes)}`,
-    'show_dialog=true',
+    `show_dialog=${showDialog}`,
   ];
   const authUri = `https://accounts.spotify.com/authorize?${params.join('&')}`;
   res.redirect(authUri);
@@ -37,11 +37,21 @@ app.get('/callback', async (req: Request, res: Response) => {
     const credentials = await SpotifyAPI.getUserCredentials(code);
     res.render('callback', { credentials });
   } catch (err) {
+    console.warn('/callback', err);
     res.redirect('/');
   }
 });
 
-app.get('/refreshToken', async (req: Request, res: Response) => {});
+// app.get('/refreshToken', async (req: Request, res: Response) => {
+//   const refreshToken: string = req.query.refresh_token as string;
+//   try {
+//     const credentials = await SpotifyAPI.refreshUserCredentials(refreshToken);
+//     res.json(credentials);
+//   } catch (err) {
+//     console.warn('/refreshToken', err);
+//     res.status(500).send();
+//   }
+// });
 
 app.get('/search', async (req: Request, res: Response) => {
   if (req.query.query == undefined) {
