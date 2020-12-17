@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+      crossorigin="anonymous"
+    />
+
+    <title>Twitch Spotify SR</title>
+  </head>
+  <body>
+    <div class="container mt-2">
+      <div id="spotifyProfile" hidden>
+        <img
+          id="spotifyProfileImage"
+          width="100"
+          height="100"
+          style="border-radius: 50%"
+        />
+        <br class="mt-2" />
+        <h3>Welcome <span id="spotifyProfileName"></span>!</h3>
+        <h4>
+          Status:
+          <span class="badge bg-danger" id="status">Disconnected</span>
+        </h4>
+        <a class="btn btn-primary btn-sml" href="/">Logout</a>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+      crossorigin="anonymous"
+    ></script>
+    <script src="/js/tmi.min.js"></script>
+    <script src="/js/spotify.js"></script>
+    <script src="/js/bot.js"></script>
+
+    <script>
+      (async () => {
+        const credentials = JSON.parse('<%- JSON.stringify(credentials) %>');
+        const bot = new Bot();
+        bot.connectToSpotify(
+          credentials.access_token,
+          credentials.refresh_token
+        );
+        bot.connectToTwitch();
+        const me = await bot.spotify.getMe();
+        const profileImage = me.images.map((image) => image.url)[0];
+        document.querySelector('span#spotifyProfileName').textContent =
+          me.display_name;
+        document.querySelector('img#spotifyProfileImage').src = profileImage;
+        document.querySelector('div#spotifyProfile').hidden = false;
+      })();
+    </script>
+  </body>
+</html>
