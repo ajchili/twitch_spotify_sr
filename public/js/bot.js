@@ -25,7 +25,7 @@ class Bot {
       if (addRequest.status === 403) {
         this.client.say(
           channel,
-          `@${channel} Unable to add @${sender}'s song to the queue, please double check that Spotify is open and playing!`
+          `Unable to add @${sender}'s song to the queue, please double check that Spotify is open and playing!`
         );
         return;
       }
@@ -36,16 +36,27 @@ class Bot {
     } catch (err) {
       this.client.say(
         channel,
-        `@${channel} an unexpected error occurred when trying to add @${sender}'s song to the queue!`
+        `An unexpected error occurred when trying to add @${sender}'s song to the queue!`
       );
     }
+  }
+  _sayMessageUsage(channel, sender) {
+    this.client.say(
+      channel,
+      `@${sender} Usage: !ssr band - song`
+    );
   }
   _setupMessageHandler() {
     this.client.on('message', (channel, tags, message, self) => {
       const sender = tags['display-name'];
       const trimmedMessage = message.trim();
+      const query = trimmedMessage.substr(5);
       if (trimmedMessage.startsWith(`!${this.command}`)) {
-        this._makeRequest(channel, sender, message.substr(5));
+        if (query.length > 0) {
+          this._makeRequest(channel, sender, query);
+        } else {
+          this._sayMessageUsage(channel, sender);
+        }
       }
     });
   }
@@ -85,7 +96,6 @@ class Bot {
     document.querySelector('span#status').classList = 'badge bg-success';
     document.querySelector('span#status').textContent = 'Connected';
   }
-
   disconnectFromTwitch() {
     if (this.client === null) {
       return;
