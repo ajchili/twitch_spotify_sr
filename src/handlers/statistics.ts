@@ -21,6 +21,5 @@ export const updateChannelActivity = (req: Request, res: Response) => {
     channel,
     channelActivity
   );
-  console.log(channel, channelActivity);
   res.status(200).send();
 };
