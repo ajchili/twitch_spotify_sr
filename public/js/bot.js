@@ -16,7 +16,7 @@ class Bot {
       if (request.status === 404) {
         this.client.say(
           channel,
-          `@${sender} "${query}" was not found on Spotify!`
+          `@${sender} "${query}" was not found on Spotify! Try requesting a song without a "-" if specified and ensure that the band name comes before the song title.`
         );
         return;
       }
