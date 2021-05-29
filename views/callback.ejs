@@ -41,17 +41,21 @@
     ></script>
     <script src="/js/tmi.min.js"></script>
     <script src="/js/spotify.js"></script>
+    <script src="/js/statisticsManager.js"></script>
     <script src="/js/bot.js"></script>
 
     <script>
       (async () => {
         const credentials = JSON.parse('<%- JSON.stringify(credentials) %>');
+        const statisticsManager = new StatisticsManager();
         const bot = new Bot();
         bot.connectToSpotify(
           credentials.access_token,
           credentials.refresh_token
         );
+        statisticsManager.updateServerStatistics('connectedToSpotify');
         bot.connectToTwitch();
+        statisticsManager.updateServerStatistics('connectToTwitch');
         const me = await bot.spotify.getMe();
         const profileImage = me.images.map((image) => image.url)[0];
         document.querySelector('span#spotifyProfileName').textContent =

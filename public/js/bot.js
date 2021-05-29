@@ -11,6 +11,7 @@ class Bot {
     });
   }
   async _makeRequest(channel, sender, query) {
+    statisticsManager.updateServerStatistics('makeRequest');
     try {
       const request = await fetch(`/search?query=${query}`);
       if (request.status === 404) {
