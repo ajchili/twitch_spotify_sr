@@ -4,7 +4,6 @@ class StatisticsManager {
       channel: window.localStorage.getItem('botChannelName'),
       event,
     };
-    console.log(body);
     await fetch('/channels/active', {
       body: JSON.stringify(body),
       headers: {

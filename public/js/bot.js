@@ -5,13 +5,30 @@ class Bot {
   OAuthPassword = window.localStorage.getItem('botOAuthPassword') || '';
   client = null;
   spotify;
+  statisticsManager;
   constructor() {
+    this.statisticsManager = new StatisticsManager();
     window.addEventListener('beforeunload', () => {
       this.disconnectFromTwitch();
     });
   }
+  async _getCurrentSong(channel, sender) {
+    this.statisticsManager.updateServerStatistics('getCurrentSong');
+    try {
+      const currentSong = await this.spotify.getCurrentSong();
+      this.client.say(
+        channel,
+        `@${sender} ${currentSong}`
+      );
+    } catch (err) {
+      this.client.say(
+        channel,
+        `An unexpected error occurred when @${sender} tried to get the current song!`
+      );
+    }
+  }
   async _makeRequest(channel, sender, query) {
-    statisticsManager.updateServerStatistics('makeRequest');
+    this.statisticsManager.updateServerStatistics('makeRequest');
     try {
       const request = await fetch(`/search?query=${query}`);
       if (request.status === 404) {
@@ -51,13 +68,17 @@ class Bot {
     this.client.on('message', (channel, tags, message, self) => {
       const sender = tags['display-name'];
       const trimmedMessage = message.trim();
-      const query = trimmedMessage.substr(5);
       if (trimmedMessage.startsWith(`!${this.command}`)) {
+        const query = trimmedMessage.substr(5);
         if (query.length > 0) {
           this._makeRequest(channel, sender, query);
         } else {
           this._sayMessageUsage(channel, sender);
         }
+      } else if (
+        trimmedMessage.startsWith('!currentsong')
+        || trimmedMessage.startsWith('!song')) {
+        this._getCurrentSong(channel, sender);
       }
     });
   }

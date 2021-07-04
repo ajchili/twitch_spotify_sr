@@ -17,6 +17,26 @@ class Spotify {
       },
     });
   }
+  async getCurrentSong() {
+    const request = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+      },
+    });
+    switch (request.status) {
+      case 200:
+        const json = await request.json();
+        const name = json['item']['name'];
+        const artist = json['item']['artists'][0]['name'];
+        const spotifyURL = json['item']['external_urls']['spotify'];
+        return `${name} by ${artist}. You can listen to it at ${spotifyURL}`;
+      case 204:
+        return 'No song is being played in Spotify.';
+      default:
+        console.warn(response);
+        return 'Unable to get currently playing song in Spotify';
+    }
+  }
   async getMe() {
     const request = await fetch('https://api.spotify.com/v1/me', {
       headers: {

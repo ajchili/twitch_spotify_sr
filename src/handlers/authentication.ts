@@ -3,7 +3,7 @@ import { API as SpotifyAPI } from '../lib/spotify';
 
 export const authorizerHandler = (req: Request, res: Response) => {
   const showDialog = req.query.show_dialog === 'false' ? 'false' : 'true';
-  const scopes = 'user-modify-playback-state';
+  const scopes = 'user-read-playback-state user-modify-playback-state';
   const params = [
     `client_id=${process.env.SPOTIFY_CLIENT_ID}`,
     `redirect_uri=${encodeURIComponent(process.env.REDIRECT_URI)}`,
